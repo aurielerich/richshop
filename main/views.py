@@ -5,7 +5,7 @@ from .models import Product
 def show_main(request):
     products = Product.objects.all()
     context = {
-        'nama_project' : "Rich Shop",
+        'name_project' : "Rich Shop",
         'npm' : '2406428806',
         'name': 'Auriel Erich Ibrahim Nst',
         'class': 'PBP F',
