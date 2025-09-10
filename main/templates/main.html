@@ -7,18 +7,20 @@
 <hr>
 
 <h2>Daftar Produk</h2>
-
-<div style="display: flex; flex-wrap: wrap; gap: 20px;">
+<div>
     {% for product in products %}
-        <div class="product-card" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; width: 200px;">
-            <img src="{{ product.thumbnail }}" alt="{{ product.name }}" style="width: 100%; height: 150px; object-fit: cover;">
+        <div class="product-card">
+            <img src="{{ product.thumbnail }}" alt="{{ product.name }}">
             <h4>{{ product.name }}</h4>
             <p><strong>Kategori:</strong> {{ product.category }}</p>
             <p><strong>Harga:</strong> Rp {{ product.price }}</p>
             <p>{{ product.description }}</p>
             {% if product.is_featured %}
-                <p style="color: green; font-weight: bold;">Produk Unggulan!</p>
+                <p>Produk Unggulan!</p>
             {% endif %}
+            <hr> 
         </div>
+    {% empty %}
+        <p>Belum ada produk untuk ditampilkan.</p>
     {% endfor %}
 </div>
