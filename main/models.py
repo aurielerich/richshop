@@ -12,12 +12,12 @@ class Product(models.Model):
         ('KOLEKTIBEL', 'Kolektibel & Merchandise'),
     ]
     
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # title = models.CharField(max_length=255)
     # content = models.TextField()
     # category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='update')
     # thumbnail = models.URLField(blank=True, null=True)
-    # news_views = models.PositiveIntegerField(default=0)
+    product_views = models.PositiveIntegerField(default=0)
     # created_at = models.DateTimeField(auto_now_add=True)
     # is_featured = models.BooleanField(default=False)
     name = models.CharField(max_length=255)
@@ -36,13 +36,21 @@ class Product(models.Model):
     
     @property
     # def is_news_hot(self):
-    #     return self.news_views > 20
+    #     return self.product_views > 20
         
     # def increment_views(self):
     #     self.stock+= 1
     #     self.save()
     def __str__(self):
         return self.name
+    
+    @property
+    def is_product_hot(self):
+        return self.product_views > 20
+        
+    def increment_views(self):
+        self.product_views += 1
+        self.save()
     
     def is_in_stock(self):
         return self.stock > 0

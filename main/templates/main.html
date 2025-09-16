@@ -1,26 +1,47 @@
-<h1>Selamat Datang di {{ name_project}}</h1>
+{% extends 'base.html' %}
+{% block content %}
+<h1>Selamat Datang di {{ name_project }}</h1>
 
-<h5>Nama: {{ name }}</h5>
-<p>Kelas: {{ class }}</p>
-<p>NPM: {{ npm }}</p>
+<h5>NPM: </h5>
+<p>{{ npm }}</p>
+
+<h5>Name:</h5>
+<p>{{ name }}</p>
+
+<h5>Class:</h5>
+<p>{{ class }}</p>
+
+<a href="{% url 'main:create_product' %}">
+  <button>+ Add Product</button>
+</a>
 
 <hr>
 
-<h2>Daftar Produk</h2>
+{% if not product_list %}
+<p>Belum ada produk yang di jual.</p>
+{% else %}
+
+{% for product in product_list %}
 <div>
-    {% for product in products %}
-        <div class="product-card">
-            <img src="{{ product.thumbnail }}" alt="{{ product.name }}">
-            <h4>{{ product.name }}</h4>
-            <p><strong>Kategori:</strong> {{ product.category }}</p>
-            <p><strong>Harga:</strong> Rp {{ product.price }}</p>
-            <p>{{ product.description }}</p>
-            {% if product.is_featured %}
-                <p>Produk Unggulan!</p>
-            {% endif %}
-            <hr> 
-        </div>
-    {% empty %}
-        <p>Belum ada produk untuk ditampilkan.</p>
-    {% endfor %}
+  <h2><a href="{% url 'main:show_product' product.id %}">{{ product.title }}</a></h2>
+
+  <p><b>{{ product.get_category_display }}</b>{% if product.is_featured %} | 
+    <b>Featured</b>{% endif %}{% if product.is_product_hot %} | 
+    <b>Hot</b>{% endif %} | <i>{{ product.created_at|date:"d M Y H:i" }}</i> 
+    | Views: {{ product.product_views }}</p>
+
+  {% if product.thumbnail %}
+  <img src="{{ product.thumbnail }}" alt="thumbnail" width="150" height="100">
+  <br />
+  {% endif %}
+
+  <p>{{ product.content|truncatewords:25 }}...</p>
+
+  <p><a href="{% url 'main:show_product' product.id %}"><button>Read More</button></a></p>
 </div>
+
+<hr>
+{% endfor %}
+
+{% endif %}
+{% endblock content %}
