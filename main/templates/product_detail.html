@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="container">
+    <a href="{% url 'main:show_main' %}" class="back-link">← Kembali ke Katalog</a>
+
+    <article class="product-detail-card">
+        
+        <div class="product-thumbnail">
+            <img src="{{ product.thumbnail }}" alt="Gambar untuk {{ product.name }}">
+        </div>
+        
+        <div class="product-info">
+            <span class="product-category">{{ product.get_category_display }}</span>
+            <h1 class="product-title">{{ product.name }}</h1>
+            
+            <div class="product-meta">
+                <span class="meta-item"><b>Rating:</b> ⭐ {{ product.rating|floatformat:1 }} ({{ product.rating_count }} ulasan)</span>
+                <span class="meta-item"><b>Dilihat:</b> {{ product.product_views }} kali</span>
+                {% if product.is_featured %}
+                    <span class="meta-item"><b>Status:</b> Unggulan</span>
+                {% endif %}
+            </div>
+
+            <p class="product-price">Rp {{ product.price }}</p>
+            
+            <div class="product-description">
+                {{ product.description|linebreaks }}
+            </div>
+
+            <div class="product-stock">
+                {% if product.is_in_stock %}
+                    <span class="stock-status in-stock">Stok Tersedia ({{ product.stock }})</span>
+                {% else %}
+                    <span class="stock-status out-of-stock">Stok Habis</span>
+                {% endif %}
+            </div>
+
+            <a href="#" class="add-to-cart-btn {% if not product.is_in_stock %}disabled{% endif %}">
+                Tambahkan ke Keranjang
+            </a>
+        </div>
+
+    </article>
+</main>
+{% endblock content %}

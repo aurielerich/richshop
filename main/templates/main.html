@@ -1,47 +1,57 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+    <title>Rich Shop - Katalog Produk</title>
+{% endblock meta %}
+
 {% block content %}
-<h1>Selamat Datang di {{ name_project }}</h1>
+<main class="container">
+    
+    <header class="page-header">
+        <div class="header-info">
+            <h1>{{ name_project }}</h1>
+            <div class="user-details">
+                <h5>NPM: </h5>
+                <p>{{ npm }}</p>
 
-<h5>NPM: </h5>
-<p>{{ npm }}</p>
+                <h5>Name:</h5>
+                <p>{{ name }}</p>
 
-<h5>Name:</h5>
-<p>{{ name }}</p>
+                <h5>Class:</h5>
+                <p>{{ class }}</p>
+                </div>
+        </div>
+        <div class="header-action">
+            <a href="{% url 'main:create_product' %}"><button class="button">+ Tambah Produk</button></a>
+        </div>
+    </header>
 
-<h5>Class:</h5>
-<p>{{ class }}</p>
+    <section class="product-grid">
+        {% for product in product_list %}
+        <article class="product-card">
+            
+            <a href="{% url 'main:show_product' product.id %}">
+                <img src="{{ product.thumbnail }}" alt="Thumbnail untuk {{ product.name }}">
+                <h3>{{ product.name }}</h3>
+            </a>
+            
+            <p><b>Harga:</b> Rp {{ product.price }}</p>
+            <p><b>Rating:</b> ⭐ {{ product.rating|floatformat:1 }} ({{ product.rating_count }} ulasan)</p>
 
-<a href="{% url 'main:create_product' %}">
-  <button>+ Add Product</button>
-</a>
+            <p>
+                {% if product.is_in_stock %}
+                    <span class="stock-status-in">Tersedia</span>
+                {% else %}
+                    <span class="stock-status-out">Stok Habis</span>
+                {% endif %}
+            </p>
 
-<hr>
+        </article>
+        {% empty %}
+            <p>Belum ada produk untuk ditampilkan.</p>
+        {% endfor %}
+    </section>
 
-{% if not product_list %}
-<p>Belum ada produk yang di jual.</p>
-{% else %}
-
-{% for product in product_list %}
-<div>
-  <h2><a href="{% url 'main:show_product' product.id %}">{{ product.title }}</a></h2>
-
-  <p><b>{{ product.get_category_display }}</b>{% if product.is_featured %} | 
-    <b>Featured</b>{% endif %}{% if product.is_product_hot %} | 
-    <b>Hot</b>{% endif %} | <i>{{ product.created_at|date:"d M Y H:i" }}</i> 
-    | Views: {{ product.product_views }}</p>
-
-  {% if product.thumbnail %}
-  <img src="{{ product.thumbnail }}" alt="thumbnail" width="150" height="100">
-  <br />
-  {% endif %}
-
-  <p>{{ product.content|truncatewords:25 }}...</p>
-
-  <p><a href="{% url 'main:show_product' product.id %}"><button>Read More</button></a></p>
-</div>
-
-<hr>
-{% endfor %}
-
-{% endif %}
+</main>
 {% endblock content %}
