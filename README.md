@@ -53,10 +53,88 @@ Menjalankan python manage.py migrate untuk menerapkan perubahan ke database.
 
 Dengan migrasi, perubahan struktur tabel dapat dikelola secara teratur tanpa harus menulis query SQL manual.
 
-### 5.  Menurut Anda, dari semua framework yang ada, mengapa framework Django dijadikan permulaan pembelajaran pengembangan perangkat lunak?
+### 5.  Menurut, dari semua framework yang ada, mengapa framework Django dijadikan permulaan pembelajaran pengembangan perangkat lunak?
 
 Django dipilih sebagai framework awal pembelajaran karena sifatnya yang “batteries included”. Django menyediakan banyak fitur bawaan seperti sistem autentikasi, ORM, admin panel, serta arsitektur yang terstruktur. Dengan demikian, pemula dapat fokus memahami alur dasar pengembangan perangkat lunak berbasis web tanpa harus menambahkan terlalu banyak library eksternal.
 
 ### 6. Feedback untuk Asisten Dosen Tutorial 1
 
 Tutorial 1 sudah cukup jelas dalam menjelaskan konsep dasar Django, terutama dalam pembuatan proyek dan aplikasi. Penjelasan langkah demi langkah membantu pemahaman peserta. Ke depannya, akan lebih baik jika diberikan contoh konkret bagaimana setiap file (urls.py, views.py, models.py) saling terhubung dalam membentuk sebuah alur request–response yang utuh.
+
+
+
+### Tugas 2 README
+
+## 1. Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?
+
+Jelas penting karena Data Delivery berperan agar komponen sistem dapat berkomunikasi dan bertukar informasi, 
+Frontend perlu meminta data dari backend untuk mengembangkan sebuah Platform yang bagus. data delivery adalah cara yang digunakan agar keduanya bisa berkomunikasi, dimana backend fokus pada pengelolaan data untuk di delivery ke frontend, dan frontend fokus pada pengembangan platform dengan menggunakan format data yang diberikan backend
+
+## 2.  Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+
+JSON dan XML memiliki kelebihan dan kekurangan masing masing, walaupun XML memiliki beberapa fitur lebih canggih, tetapi JSON lebih populer dibandingkan dengan XML karena format penulisan JSON lebih ringkas dan ringan, lebih mudah untuk dilihat dan dipahami, serta yang terpenting bersinergi dengan JavaScript.
+
+## 3. Jelaskan fungsi dari method is_valid() pada form Django dan mengapa kita membutuhkan method tersebut?
+
+is_valid() digunakan untuk melihat apakah form yang dikirim oleh user sudah valid atau belum, dengan mempertimbangkan seperti apakah field yang wajib di isi sudah di isi?, apakah tipe datanya benar? dan masih banyak lagi, jika semuanya benar maka akan bernilai true, tetapi jika error atau ada kesalahan maka akan disimpan errornya dan mengeluarkan False, salah satu penggunannya adalah di 
+
+def create_product(request):
+    form = ProductForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return redirect('main:show_main')
+
+    context = {'form': form}
+    return render(request, "create_product.html", context)
+
+disini jika data form itu is_valid() bernilai true dan request.method == "POST" baru lah form akan di save dan kita kembali ke show_main, tetapi ketika form itu is_valid() bernilai False atau request.method != "POST" 
+maka akan mereturn render(request, "create_product.html", context)
+
+
+## 4. Mengapa kita membutuhkan csrf_token saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan csrf_token pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+
+Kita membutuhkan csrf_token untuk mencegah serangan Cross-Site Request Forgery (CSRF). Tanpa token ini, sebuah situs jahat dapat menipu browser untuk mengirim perintah palsu seperti mengubah password atau membuat postingan ke situs lain di mana sedang login, server akan salah mengira permintaan palsu tersebut sebagai permintaan yang sah.csrf_token bekerja seperti password rahasia yang unik untuk setiap form. Saat form dikirim, server django akan memeriksa apakah password cocok. Karena situs jahat tidak mengetahui passwordnya, permintaan palsu dari mereka akan langsung ditolak
+
+
+## 5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+
+pertama saya mulai dari membuat fungsi show_json, show_xml, show_json_by_id, show_xml_by_id menyesuaikan dengan apa yang sudah saya pelajari di tutorial 2 dan memasukkan path urlnya kedalam urls.py pada folder main
+
+kedua saya membuat template di folder utama di isi dengan base.html sebagai template pada html lainnya, dan menambahkannya pada settings.py
+
+ketiga saya mulai membuat dan merapikan models saya serta menambahkan beberapa function di models untuk di gunakan nnatinya
+
+ke empat saya juga membuat function tambahan pada views untuk di gunakan nantinya yaitu create_produt (fungsi untuk membuat dan menambahkan produk) dan show_product untuk melihat detail dari produk
+
+ke lima saya menambahkann path urlnya lagi kedalam urls.py pada folder main
+
+ke enam saya mulai membuat template html berdasarkan function function yang baru saya buat di views.py agar 
+
+ke tujuh saya mengecek kembali apakah ada url path yang belum di tambahkan, apakah ada pada settings.py yang perlu di perbaiki lagi (disini saya menambahkan token CSRF pada settings.py dan masih banyak lagi)
+
+
+
+## 6. Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
+
+sangat ramah dan membantu saya ketika ada masalah serta menyampaikan informasi dengan sangat jelas (makasih banh)
+
+## 7. Mengakses keempat URL di poin 2 menggunakan Postman, membuat screenshot dari hasil akses URL pada Postman, dan menambahkannya ke dalam README.md.
+
+(http://127.0.0.1:8000/json/)
+![Hasil Akses JSON di Postman](postman_json_response.png)
+
+(http://127.0.0.1:8000/xml/)
+![Hasil Akses XML di Postman](postman_xml_response.png)
+
+(http://127.0.0.1:8000/json/968d5240-0bd7-48db-a8a5-f7afa7e7544b/)
+![Hasil Akses di Postman](postman_json_baju-ronaldo_response.png)
+
+(http://127.0.0.1:8000/xml/968d5240-0bd7-48db-a8a5-f7afa7e7544b/)
+![Hasil Akses di Postman](postman_xml_baju-ronaldo_response.png)
+
+
+
+
+
+
