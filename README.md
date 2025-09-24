@@ -134,7 +134,27 @@ sangat ramah dan membantu saya ketika ada masalah serta menyampaikan informasi d
 ![Hasil Akses di Postman](postman_xml_baju-ronaldo_response.png)
 
 
+### Tugas 4
+### 1. django authenticationform
+django `AuthenticationForm` adalah form bawaan yang siap pakai untuk proses login pengguna, kelebihannya adalah sudah aman dan terintegrasi langsung dengan sistem otentikasi django, namun kekurangannya adalah kurang fleksibel jika ingin melakukan login menggunakan email secara default, karena terikat pada otentikasi dengan username
 
+### 2. perbedaan autentikasi dan otorisasi
+autentikasi adalah proses verifikasi identitas untuk menjawab "siapa anda?", sementara otorisasi adalah proses pengecekan hak akses untuk menjawab "apa yang boleh anda lakukan?", django mengimplementasikan autentikasi melalui sistem `User` dan login, sedangkan otorisasi diimplementasikan melalui *permission framework* bawaan yang menentukan hak akses pengguna terhadap data dan fitur
 
+---
+### 3. kelebihan dan kekurangan session dan cookies
+perbedaan utama antara keduanya adalah tempat penyimpanan data; *cookies* menyimpan data di browser klien, sedangkan *session* menyimpan data di server dan hanya menempatkan id penanda di *cookie* klien, akibatnya, *cookies* lebih ringan bagi server namun kurang aman dan ukurannya terbatas, sementara *session* jauh lebih aman dan bisa menyimpan data lebih besar, namun lebih membebani server
+
+---
+### 4. keamanan cookies dan penanganan oleh django
+secara default, *cookies* tidak aman dan rentan terhadap serangan seperti XSS dan CSRF, django menangani risiko ini dengan sangat baik dengan cara menerapkan *cookie* `HttpOnly` untuk mencegah akses dari javascript, flag `Secure` untuk memastikan transmisi hanya melalui HTTPS, serta menggunakan `csrf_token` yang kuat untuk memvalidasi asal dari setiap permintaan yang mengubah data
+
+---
+### 5. implementasi checklist secara step-by-step
+mengimplementasikan sebuah checklist secara profesional berarti tidak hanya mengikuti tutorial, tetapi mengubahnya menjadi proses rekayasa, ini dimulai dengan memahami tujuan akhir, lalu memecah setiap tugas menjadi komponen teknis Django (Model, URL, View, Template), selanjutnya, setiap komponen diimplementasikan secara bertahap, diuji secara lokal untuk memastikan fungsionalitasnya, baru kemudian melanjutkan ke tugas berikutnya, mengubah instruksi menjadi solusi yang terstruktur
+
+---
+### 6. alur kerja `add` - `commit` - `push` di github
+alur kerja ini adalah siklus fundamental Git untuk menyimpan dan berbagi kode, perintah `git add` berfungsi untuk memilih dan mempersiapkan perubahan yang akan disimpan, kemudian, `git commit` menyimpan perubahan yang telah dipilih tersebut secara permanen ke dalam riwayat di komputer lokal anda dengan sebuah pesan, terakhir, `git push` mengunggah semua riwayat *commit* dari lokal ke server *remote* seperti GitHub, sehingga perubahan tersebut dapat diakses oleh orang lain
 
 
