@@ -43,5 +43,10 @@
         </div>
 
     </article>
+    {% if product.user %}
+        <p>Author: {{ product.user.username }}</p>
+    {% else %}
+        <p>Author: Anonymous</p>
+    {% endif %}
 </main>
 {% endblock content %}
