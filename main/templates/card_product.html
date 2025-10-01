@@ -1,76 +1,68 @@
 {% load static %}
-<article class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-  <!-- Thumbnail -->
-  <div class="aspect-[16/9] relative overflow-hidden">
+<article class="bg-white rounded-lg ...">
+  <a href="..." class="block relative h-48 w-full overflow-hidden">
+    
     {% if product.thumbnail %}
-      <img src="{{ product.thumbnail }}" alt="{{ product.title }}" class="w-full h-full object-cover">
+      <img src="{{ product.thumbnail.url }}" alt="Thumbnail for {{ product.name }}" class="w-full h-full object-cover">
     {% else %}
-      <div class="w-full h-full bg-gray-200"></div>
+      <img src="{% static 'image/no-product.png' %}" alt="No image available" class="w-full h-full object-cover">
     {% endif %}
 
-    <!-- Category Badge -->
-    <div class="absolute top-3 left-3">
-      <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-green-600 text-white">
-        {{ product.get_category_display }}
-      </span>
-    </div>
+    </a>
+  </article>
 
-    <!-- Status Badges -->
-    <div class="absolute top-3 right-3 flex space-x-2">
-      {% if product.is_featured %}
-        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-          Featured
-        </span>
-      {% endif %}
-      {% if product.is_product_hot %}
-        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
-          Hot
-        </span>
-      {% endif %}
-    </div>
-  </div>
 
-  <!-- Content -->
-  <div class="p-5">
-    <div class="flex items-center text-sm text-gray-500 mb-3">
-      <time datetime="{{ product.created_at|date:'c' }}">
-        {{ product.created_at|date:"M j, Y" }}
-      </time>
-      <span class="mx-2">•</span>
-      <span>{{ product.product_views }} views</span>
-    </div>
-
-    <h3 class="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
-      <a href="{% url 'main:show_product' product.id %}" class="hover:text-green-600 transition-colors">
-        {{ product.title }}
-      </a>
-    </h3>
-
-    <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
-      {{ product.content|truncatewords:20 }}
-    </p>
-
-    <!-- Action Buttons -->
-    {% if user.is_authenticated and product.user == user %}
-      <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-        <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 font-medium text-sm transition-colors">
-          Read more
-        </a>
-        <div class="flex space-x-2">
-          <a href="{% url 'main:edit_product' product.id %}" class="text-gray-600 hover:text-gray-700 text-sm transition-colors">
-            Edit
-          </a>
-          <a href="{% url 'main:delete_product' product.id %}" class="text-red-600 hover:text-red-700 text-sm transition-colors">
-            Delete
-          </a>
+<article class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
+    <a href="{% url 'main:show_product' product.id %}" class="block relative h-48 w-full overflow-hidden">
+        {% if product.thumbnail %}
+            <img src="{{ product.thumbnail.url }}" alt="Thumbnail for {{ product.name }}" class="w-full h-full object-cover">
+        {% else %}
+            <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+                No Image
+            </div>
+        {% endif %}
+        
+        <div class="absolute top-2 right-2 flex space-x-1">
+            {% if product.is_featured %}
+                <span class="bg-yellow-400 text-yellow-900 text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-sm">Featured</span>
+            {% endif %}
+            {% if product.is_hot %}
+                <span class="bg-red-500 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-sm">Hot</span>
+            {% endif %}
         </div>
-      </div>
-    {% else %}
-      <div class="pt-4 border-t border-gray-100">
-        <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 font-medium text-sm transition-colors">
-          Read more →
+        
+        <span class="absolute bottom-2 left-2 bg-indigo-600 text-white text-xs font-medium px-2 py-1 rounded-md shadow-sm">
+            {{ product.category }}
+        </span>
+    </a>
+
+    <div class="p-4 flex flex-col flex-grow">
+        <a href="{% url 'main:show_product' product.id %}" class="hover:text-indigo-600 transition-colors duration-200">
+            <h3 class="text-xl font-semibold text-gray-900 line-clamp-2 mb-1">{{ product.name }}</h3>
         </a>
-      </div>
-    {% endif %}
-  </div>
+        <p class="text-lg font-bold text-gray-800 mb-2">Rp {{ product.price|floatformat:0 }}</p>
+        <p class="text-sm text-gray-600 line-clamp-3 flex-grow">{{ product.description|truncatewords:20 }}</p>
+
+        <div class="mt-3 flex items-center justify-between text-sm text-gray-500">
+            <span>⭐ {{ product.rating|floatformat:1 }} ({{ product.rating_count }} ulasan)</span>
+            <span>
+                {% if product.is_in_stock %}
+                    <span class="text-green-600 font-medium">Tersedia</span>
+                {% else %}
+                    <span class="text-red-600 font-medium">Stok Habis</span>
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
+            <a href="{% url 'main:show_product' product.id %}" class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200">Read more &rarr;</a>
+            
+            {% if user.is_authenticated and product.user == request.user %}
+                <div class="flex space-x-3">
+                    <a href="{% url 'main:edit_product' product.id %}" class="text-gray-500 hover:text-indigo-600 transition-colors duration-200">Edit</a>
+                    <a href="{% url 'main:delete_product' product.id %}" class="text-gray-500 hover:text-red-600 transition-colors duration-200">Delete</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </article>

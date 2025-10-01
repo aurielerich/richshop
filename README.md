@@ -171,3 +171,52 @@ untuk melindungi halaman tertentu, *decorator* `@login_required` diterapkan pada
 setelah semua fitur selesai dan diuji lokal, kode disimpan menggunakan Git dan diunggah dengan `push` ke repository GitHub, selanjutnya, perubahan yang sama juga di-*push* ke pws agar fungsionalitas baru dapat diakses secara online
 
 
+
+
+### Tugas 5
+
+### 1. urutan prioritas css selector
+jika beberapa selector CSS menargetkan elemen html yang sama, prioritasnya ditentukan oleh **spesifisitas**, urutan dari yang tertinggi adalah *inline style*, diikuti oleh selektor id, kemudian selektor *class* atau atribut, dan yang terendah adalah selektor tipe elemen, aturan `!important` akan menimpa semua prioritas ini
+
+---
+### 2. mengapa responsive design menjadi konsep yang penting
+**responsive design** adalah konsep penting agar website dapat beradaptasi dengan berbagai ukuran layar, dari desktop hingga ponsel, ini penting karena keberagaman perangkat saat ini dan tanpanya, pengguna ponsel akan mendapat pengalaman yang buruk, contoh situs responsif adalah tokopedia yang tata letaknya berubah di ponsel, sementara situs lama yang tidak responsif akan terlihat sangat kecil dan sulit dibaca
+
+---
+### 3. jelaskan perbedaan antara margin, border, dan padding
+**margin**, **border**, dan **padding** adalah komponen dari css box model, **padding** adalah ruang di dalam elemen antara konten dan border, **border** adalah garis yang mengelilingi elemen, dan **margin** adalah ruang di luar elemen yang menciptakan jarak dengan elemen lain, ketiganya dapat diimplementasikan dalam css seperti ini: `.box { margin: 20px; border: 1px solid black; padding: 10px; }`
+
+---
+### 4. jelaskan konsep flex box dan grid layout
+**flexbox** dan **grid** adalah sistem layout modern di CSS, **flexbox** adalah sistem *satu dimensi* yang ideal untuk mengatur item dalam satu baris atau satu kolom, seperti pada menu navigasi, sementara itu, **grid** adalah sistem *dua dimensi* yang sempurna untuk membuat tata letak halaman yang kompleks dengan baris dan kolom secara bersamaan, seperti galeri foto atau struktur utama halaman
+
+## step by step
+
+1.  **Modularisasi:** Logika buat nampilin satu produk dipisah dari `main.html` ke file komponen sendiri, `card_product.html`. Jadi kodenya lebih rapih, gampang diatur, dan komponen kartunya bisa dipakai ulang di bagian lain.  
+
+2.  **Desain Visual yang Informatif:** Kartu produk ditambahin *badge* warna yang ditempel di atas gambar. Dipakai buat nampilin info singkat kayak **Kategori**, status **"Featured"**, atau **"Hot"** tanpa makan banyak tempat.  
+
+3.  **Otorisasi di Template:** Logika otorisasi langsung ditaruh di template dengan `{% if user.is_authenticated and product.user == request.user %}`. Jadi tombol **"Edit"** sama **"Delete"** cuma muncul kalau user yang login memang pemilik produk. Lebih aman dan enak dipakai.  
+
+4.  **Konsistensi Tampilan:** Biar grid tetap rapih, dipakai kelas `line-clamp` dan filter `truncatewords` di judul sama deskripsi. Hasilnya semua kartu punya tinggi seragam dan kelihatan lebih profesional meskipun kontennya panjang.  
+
+
+## Implementasi Upload Thumbnail
+
+Thumbnail produk sekarang bukan lagi input URL, tapi udah bisa *upload* gambar langsung. Perubahannya:  
+
+1.  **Model:** Di `models.py`, field `thumbnail` diganti dari `URLField` jadi `ImageField`. Butuh install *library* `Pillow` biar backend bisa proses gambar.  
+
+2.  **Konfigurasi Project:** Di `settings.py` ditambah `MEDIA_ROOT` buat nyimpen file upload, dan `MEDIA_URL` buat akses file itu lewat URL.  
+
+3.  **URL Project:** `urls.py` utama diupdate supaya file media bisa ditampilkan pas mode dev (`DEBUG=True`).  
+
+4.  **Form & View:**
+    * Form di `create_product.html` sama `edit_product.html` ditambah `enctype="multipart/form-data"`.  
+    * View yang handle form juga diupdate biar bisa baca `request.FILES`.  
+
+5.  **Template Tampilan:**
+    * Semua tag `<img>` yang dulu pakai `{{ product.thumbnail }}` diganti jadi `{{ product.thumbnail.url }}`.  
+    * Kalau produk nggak punya gambar, otomatis muncul *placeholder* (`no-product.png`) dari folder *static*.  
+
+6.  **Migrasi Database:** Jangan lupa jalanin `makemigrations` sama `migrate` buat nyesuaiin struktur database.  

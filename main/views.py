@@ -93,7 +93,7 @@ def show_json_by_id(request, product_id):
 
 @login_required(login_url='/login')
 def create_product(request):
-    form = ProductForm(request.POST or None)
+    form = ProductForm(request.POST or None, request.FILES or None)
 
     if form.is_valid() and request.method == 'POST':
         product_entry = form.save(commit = False)
