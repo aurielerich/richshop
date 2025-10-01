@@ -151,10 +151,23 @@ secara default, *cookies* tidak aman dan rentan terhadap serangan seperti XSS da
 
 ---
 ### 5. implementasi checklist secara step-by-step
-mengimplementasikan sebuah checklist secara profesional berarti tidak hanya mengikuti tutorial, tetapi mengubahnya menjadi proses rekayasa, ini dimulai dengan memahami tujuan akhir, lalu memecah setiap tugas menjadi komponen teknis Django (Model, URL, View, Template), selanjutnya, setiap komponen diimplementasikan secara bertahap, diuji secara lokal untuk memastikan fungsionalitasnya, baru kemudian melanjutkan ke tugas berikutnya, mengubah instruksi menjadi solusi yang terstruktur
+### 1. memperbarui struktur data dengan relasi pengguna
+langkah pertama adalah memodifikasi model `Product` di `models.py` dengan mengimpor `User` dan menambahkan *field* `ForeignKey` ke `User`, ini dilakukan untuk menautkan setiap produk ke seorang pengguna dan akan menghapus produk terkait jika pengguna dihapus (`on_delete=models.CASCADE`)
 
 ---
-### 6. alur kerja `add` - `commit` - `push` di github
-alur kerja ini adalah siklus fundamental Git untuk menyimpan dan berbagi kode, perintah `git add` berfungsi untuk memilih dan mempersiapkan perubahan yang akan disimpan, kemudian, `git commit` menyimpan perubahan yang telah dipilih tersebut secara permanen ke dalam riwayat di komputer lokal anda dengan sebuah pesan, terakhir, `git push` mengunggah semua riwayat *commit* dari lokal ke server *remote* seperti GitHub, sehingga perubahan tersebut dapat diakses oleh orang lain
+### 2. sinkronisasi database dengan model baru
+setelah model diubah, struktur database disinkronkan dengan menjalankan perintah `migrate`, django akan otomatis menerapkan perubahan pada model `Product` dengan menambahkan kolom `user_id` ke tabel database
+
+---
+### 3. membangun fungsionalitas registrasi dan sesi pengguna
+di `views.py`, fungsionalitas otentikasi dibangun dengan mengimpor `UserCreationForm`, `AuthenticationForm`, serta fungsi seperti `authenticate`, `login`, dan `logout`, selanjutnya, fungsi `register`, `login_user`, dan `logout_user` diimplementasikan untuk menangani pendaftaran dan manajemen sesi pengguna, termasuk validasi dengan `form.is_valid()`
+
+---
+### 4. mengamankan halaman khusus pengguna
+untuk melindungi halaman tertentu, *decorator* `@login_required` diterapkan pada *view* `show_main` dan `show_product`, ini memastikan hanya pengguna yang sudah login yang dapat mengakses halaman tersebut dan akan mengalihkan pengguna anonim ke halaman login
+
+---
+### 5. menyimpan dan mempublikasikan perubahan
+setelah semua fitur selesai dan diuji lokal, kode disimpan menggunakan Git dan diunggah dengan `push` ke repository GitHub, selanjutnya, perubahan yang sama juga di-*push* ke pws agar fungsionalitas baru dapat diakses secara online
 
 

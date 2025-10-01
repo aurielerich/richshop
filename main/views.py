@@ -43,7 +43,7 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return response
 
-# Create your views here.
+@login_required(login_url='/login/')
 def show_main(request):
     filter_type = request.GET.get("filter", "all")  # default 'all'
 
@@ -117,3 +117,22 @@ def show_product(request, id):
     }
 
     return render(request, "product_detail.html", context)
+
+def edit_product(request, id):
+    Product = get_object_or_404(Product, pk=id)
+    form = ProductForm(request.POST or None, instance=Product)
+    if form.is_valid() and request.method == 'POST':
+        form.save()
+        return redirect('main:show_main')
+
+    context = {
+        'form': form
+    }
+
+    return render(request, "edit_product.html", context)
+
+
+def delete_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    product.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))
