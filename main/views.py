@@ -123,23 +123,29 @@ def show_product(request, id):
 
     return render(request, "product_detail.html", context)
 
+@login_required(login_url='/login/')
 def edit_product(request, id):
-    Product = get_object_or_404(Product, pk=id)
-    form = ProductForm(request.POST or None, instance=Product)
-    if form.is_valid() and request.method == 'POST':
+    # 1. Ambil objek produk di awal, di luar blok if
+    product = get_object_or_404(Product, pk=id)
+
+    # Pastikan hanya pemilik yang bisa mengedit
+    if product.user != request.user:
+        return redirect('main:show_main')
+
+    # 2. Inisialisasi form dengan data produk yang sudah ada (instance)
+    form = ProductForm(request.POST or None, request.FILES or None, instance=product)
+
+    if form.is_valid() and request.method == "POST":
         form.save()
         return redirect('main:show_main')
 
-    context = {
-        'form': form
-    }
-
+    context = {'form': form, 'product': product}
     return render(request, "edit_product.html", context)
 
 
 @csrf_exempt
 def delete_product(request, id):
-    if request.method == "POST":
+    if request.method == "GET":
         product = get_object_or_404(Product, pk=id)
         product.delete()
         return JsonResponse({"success": True, "message": "Product deleted successfully!"})

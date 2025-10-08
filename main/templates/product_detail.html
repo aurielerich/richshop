@@ -64,7 +64,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const PRODUCT_ID = "{{ product_id }}";
+    const PRODUCT_ID = "{{ product.id }}";
     const API_ENDPOINT = `{% url 'main:show_json_by_id' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', PRODUCT_ID);
     const CURRENT_USER_ID = "{{ user.id|default:'' }}";
 
