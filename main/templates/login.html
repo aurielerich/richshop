@@ -13,32 +13,10 @@
         <p class="text-gray-600">Welcome back to RichShop</p>
       </div>
 
-      <!-- Form Errors Display -->
-      {% if form.non_field_errors %}
-        <div class="mb-6">
-          {% for error in form.non_field_errors %}
-            <div class="px-4 py-3 rounded-md text-sm border bg-red-50 border-red-200 text-red-700">
-              {{ error }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
+      <div id="error-message-box" class="hidden mb-6 px-4 py-3 rounded-md text-sm border bg-red-50 border-red-200 text-red-700">
+      </div>
 
-      {% if form.errors %}
-        <div class="mb-6">
-          {% for field, errors in form.errors.items %}
-            {% if field != '__all__' %}
-              {% for error in errors %}
-                <div class="px-4 py-3 rounded-md text-sm border bg-red-50 border-red-200 text-red-700 mb-2">
-                  <strong>{{ field|title }}:</strong> {{ error }}
-                </div>
-              {% endfor %}
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% endif %}
-
-      <form method="POST" action="" class="space-y-6">
+      <form id="login_form" method="POST" class="space-y-6">
         {% csrf_token %}
         
         <div>
@@ -70,27 +48,6 @@
         </button>
       </form>
 
-      <!-- Messages Display -->
-      {% if messages %}
-        <div class="mt-6">
-          {% for message in messages %}
-            <div 
-              class="
-                px-4 py-3 rounded-md text-sm border
-                {% if message.tags == 'success' %}
-                  bg-green-50 border-green-200 text-green-700
-                {% elif message.tags == 'error' %}
-                  bg-red-50 border-red-200 text-red-700
-                {% else %}
-                  bg-gray-50 border-gray-200 text-gray-700
-                {% endif %}
-              ">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
       <div class="mt-6 text-center pt-6 border-t border-gray-200">
         <p class="text-gray-500 text-sm">
           Don't have an account? 
@@ -102,4 +59,66 @@
     </div>
   </div>
 </div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.getElementById("login_form").addEventListener("submit", async function(e) {
+    e.preventDefault(); 
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const errorBox = document.getElementById("error-message-box");
+    const csrftoken = getCookie('csrftoken');
+    errorBox.classList.add("hidden");
+
+    try {
+        const response = await fetch("{% url 'main:ajax_login' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+            },
+            body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showToast('info', 'Login Successful', data.message);
+            setTimeout(() => {
+                window.location.href = "{% url 'main:show_main' %}";
+            }, 1500);
+        } else {
+            let errorMessage = "Invalid username or password. Please try again.";
+            if (data.errors && data.errors.non_field_errors) {
+                errorMessage = data.errors.non_field_errors[0];
+            }
+            
+            errorBox.textContent = errorMessage;
+            errorBox.classList.remove("hidden");
+            showToast('error', 'Login Failed', errorMessage);
+        }
+
+    } catch (error) {
+        console.error("Error:", error);
+        const errorMessage = "An unexpected error occurred. Please try again later.";
+        errorBox.textContent = errorMessage;
+        errorBox.classList.remove("hidden");
+        showToast('error', 'Error', errorMessage);
+    }
+});
+</script>
 {% endblock content %}

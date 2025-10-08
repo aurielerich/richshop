@@ -2,87 +2,153 @@
 {% load static %}
 
 {% block meta %}
-<title>{{ product.title }} - RichShop</title>
+    <title>Loading Product... - RichShop</title>
 {% endblock meta %}
 
 {% block content %}
-<div class="bg-gray-50 w-full min-h-screen">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Back Navigation -->
-        <div class="mb-6">
-            <a href="{% url 'main:show_main' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                ← Back to Product
-            </a>
-        </div>
-        
-        <!-- Article -->
-        <article class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            
-            <!-- Header -->
-            <div class="p-6 sm:p-8">
-                <div class="flex flex-wrap items-center gap-2 mb-4">
-                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-green-600 text-white">
-                        {{ product.get_category_display }}
-                    </span>
-                    {% if product.is_featured %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
-                            Featured
-                        </span>
-                    {% endif %}
-                    {% if product.is_product_hot %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800">
-                            Hot
-                        </span>
-                    {% endif %}
-                </div>
-                
-                <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-4">
-                    {{ product.title }}
-                </h1>
-                
-                <div class="flex flex-wrap items-center text-sm text-gray-500 gap-4">
-                    <time datetime="{{ product.created_at|date:'c' }}">
-                        {{ product.created_at|date:"M j, Y g:i A" }}
-                    </time>
-                    <span>{{ product.product_views }} views</span>
-                </div>
-            </div>
-
-            <!-- Featured Image -->
-            {% if product.thumbnail %}
-                <div class="px-6 sm:px-8">
-                    <img src="{{ product.thumbnail }}" 
-                         alt="{{ product.title }}" 
-                         class="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-lg">
-                </div>
-            {% endif %}
-
-            <!-- Content -->
-            <div class="p-6 sm:p-8">
-                <div class="prose prose-lg max-w-none">
-                    <div class="text-gray-700 leading-relaxed whitespace-pre-line text-base sm:text-lg">
-                        {{ product.content }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Author Info -->
-            <div class="border-t border-gray-200 p-6 sm:p-8 bg-gray-50">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="font-medium text-gray-900">
-                            {% if product.user %}
-                                <p>Author: {{ product.user.username }}</p>
-                            {% else %}
-                                <p>Author: Anonymous</p>
-                            {% endif %}
-                        </div>
-                        <p class="text-sm text-gray-500">Author</p>
-                    </div>
-                </div>
-            </div>
-        </article>
+<main class="container mx-auto px-4 py-8">
+    
+    <div class="mb-6">
+        <a href="{% url 'main:show_main' %}" class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+            ← Kembali ke Katalog
+        </a>
     </div>
-</div>
+
+    <div id="loading-state" class="text-center py-20">
+        <svg class="animate-spin h-10 w-10 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+        <p class="mt-3 text-gray-600">Loading product details...</p>
+    </div>
+
+    <div id="error-state" class="hidden text-center py-20 bg-red-50 border border-red-200 rounded-lg">
+        <h3 class="text-xl font-semibold text-red-800">Failed to Load Product</h3>
+        <p class="mt-2 text-red-600">The product you are looking for could not be found or an error occurred. Please try again later.</p>
+    </div>
+
+    <article id="product-content" class="hidden bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+            
+            <div id="product-thumbnail-container" class="md:col-span-2 bg-gray-100 flex items-center justify-center min-h-[300px] md:min-h-0">
+                </div>
+            
+            <div class="md:col-span-3 p-6 flex flex-col">
+                <div class="flex-grow">
+                    <div id="product-badges-container" class="flex flex-wrap items-center gap-2 mb-3">
+                        </div>
+                    
+                    <h1 id="product-name" class="text-3xl font-bold text-gray-900 leading-tight"></h1>
+                    <div id="product-author" class="mt-2 text-sm text-gray-500"></div>
+
+                    <div class="my-4 flex flex-wrap items-center text-sm text-gray-600 gap-x-4 gap-y-1">
+                        <span id="product-rating"></span>
+                        <span id="product-views"></span>
+                    </div>
+
+                    <div id="product-price" class="text-3xl font-bold text-indigo-600 my-4"></div>
+
+                    <div id="product-description" class="prose max-w-none text-gray-700 leading-relaxed">
+                        </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <div id="product-stock" class="mb-4"></div>
+                    <div id="action-buttons" class="flex items-center gap-3">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const PRODUCT_ID = "{{ product_id }}";
+    const API_ENDPOINT = `{% url 'main:show_json_by_id' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', PRODUCT_ID);
+    const CURRENT_USER_ID = "{{ user.id|default:'' }}";
+
+    const loadingState = document.getElementById('loading-state');
+    const errorState = document.getElementById('error-state');
+    const productContent = document.getElementById('product-content');
+
+    async function loadProductDetails() {
+        showState('loading');
+        try {
+            const response = await fetch(API_ENDPOINT);
+            if (!response.ok) {
+                throw new Error(`Product not found or server error: ${response.status}`);
+            }
+            const data = await response.json();
+            const product = data[0].fields;
+            product.pk = data[0].pk; 
+            
+            renderProduct(product);
+            showState('ready');
+
+        } catch (e) {
+            console.error("Failed to load product details:", e);
+            showState('error');
+        }
+    }
+
+    function renderProduct(product) {
+        document.title = `${product.name} - RichShop`;
+
+        const thumbnailContainer = document.getElementById('product-thumbnail-container');
+        if (product.thumbnail) {
+            thumbnailContainer.innerHTML = `<img src="/media/${product.thumbnail}" alt="${product.name}" class="w-full h-full object-cover">`;
+        } else {
+            thumbnailContainer.innerHTML = `<div class="text-gray-500">No Image</div>`;
+        }
+
+        const badgesContainer = document.getElementById('product-badges-container');
+        badgesContainer.innerHTML = `
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">${product.category}</span>
+            ${product.is_featured ? `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Featured</span>` : ''}
+        `;
+        
+        document.getElementById('product-name').textContent = product.name;
+        document.getElementById('product-author').innerHTML = `By <span class="font-medium text-gray-800">${product.user_username || 'Anonymous'}</span>`; // Asumsi 'user_username' dikirim dari serializer
+        document.getElementById('product-rating').innerHTML = `⭐ <b>${Number(product.rating).toFixed(1)}</b> (${product.rating_count} reviews)`;
+        document.getElementById('product-views').textContent = `• ${product.product_views} views`;
+        document.getElementById('product-price').textContent = `Rp ${product.price}`;
+        document.getElementById('product-description').textContent = product.description;
+
+        const stockContainer = document.getElementById('product-stock');
+        if (product.stock > 0) {
+            stockContainer.innerHTML = `<span class="text-green-600 font-bold">Stok Tersedia (${product.stock})</span>`;
+        } else {
+            stockContainer.innerHTML = `<span class="text-red-600 font-bold">Stok Habis</span>`;
+        }
+
+        const buttonsContainer = document.getElementById('action-buttons');
+        let buttonsHTML = '';
+        if (CURRENT_USER_ID && product.user == CURRENT_USER_ID) {
+            const editUrl = `{% url 'main:edit_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', product.pk);
+            const deleteUrl = `{% url 'main:delete_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', product.pk);
+            buttonsHTML = `
+                <a href="${editUrl}" class="flex-1 text-center px-6 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors">Edit</a>
+                <a href="${deleteUrl}" class="flex-1 text-center px-6 py-3 border border-red-500 text-red-600 rounded-md font-medium hover:bg-red-500 hover:text-white transition-colors">Delete</a>
+            `;
+        } else {
+            const addToCartDisabled = product.stock <= 0 ? 'disabled' : '';
+            buttonsHTML = `
+                <button ${addToCartDisabled} class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-md font-medium hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    Add to Cart
+                </button>
+            `;
+        }
+        buttonsContainer.innerHTML = buttonsHTML;
+    }
+
+    function showState(state) {
+        loadingState.classList.toggle('hidden', state !== 'loading');
+        errorState.classList.toggle('hidden', state !== 'error');
+        productContent.classList.toggle('hidden', state !== 'ready');
+    }
+
+    loadProductDetails();
+});
+</script>
 {% endblock content %}

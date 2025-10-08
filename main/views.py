@@ -10,6 +10,11 @@ from django.contrib.auth.decorators import login_required
 import datetime
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils.html import strip_tags
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.contrib.auth.models import User
 
 def register(request):
     form = UserCreationForm()
@@ -45,12 +50,12 @@ def logout_user(request):
 
 @login_required(login_url='/login/')
 def show_main(request):
-    filter_type = request.GET.get("filter", "all")  # default 'all'
+    filter_type = request.GET.get("filter", "all")
 
     if filter_type == "all":
-        product_list = Product.objects.all()
+        product_list = Product.objects.all().order_by("-created_at")
     else:
-        product_list = Product.objects.filter(user=request.user)
+        product_list = Product.objects.filter(user=request.user).order_by("-created_at")
 
     context = {
         'npm': '2406428806',
@@ -132,7 +137,86 @@ def edit_product(request, id):
     return render(request, "edit_product.html", context)
 
 
+@csrf_exempt
 def delete_product(request, id):
-    product = get_object_or_404(Product, pk=id)
-    product.delete()
-    return HttpResponseRedirect(reverse('main:show_main'))
+    if request.method == "POST":
+        product = get_object_or_404(Product, pk=id)
+        product.delete()
+        return JsonResponse({"success": True, "message": "Product deleted successfully!"})
+    else:
+        return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
+
+
+
+
+@csrf_exempt
+@require_POST 
+def add_product_entry_ajax(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": "error", "message": "Anda harus login untuk menambahkan produk."}, status=403)
+
+    form = ProductForm(request.POST, request.FILES or None)
+
+    if form.is_valid():
+        product = form.save(commit=False)
+        product.user = request.user
+        product.save()
+
+        return JsonResponse({
+            "status": "success",
+            "message": "Produk berhasil ditambahkan!",
+            "pk": product.pk,
+            "fields": {
+                "name": product.name,
+                "price": product.price,
+                "description": product.description,
+            }
+        }, status=201)
+    else:
+        return JsonResponse({
+            "status": "error",
+            "errors": form.errors,
+        }, status=400)
+    
+
+def ajax_register(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        
+        if form.is_valid():
+            form.save()
+            return JsonResponse({
+                "success": True, 
+                "message": "Akun berhasil dibuat!"
+            }, status=201)
+        else:
+            return JsonResponse({
+                "success": False, 
+                "errors": form.errors
+            }, status=400)
+        
+    return JsonResponse({"success": False, "message": "Metode request tidak valid."}, status=405)
+
+
+@csrf_exempt
+@require_POST
+def ajax_login(request):
+    # Gunakan AuthenticationForm untuk memvalidasi data login
+    # Form ini mengambil 'request' sebagai argumen pertama
+    form = AuthenticationForm(request, data=request.POST)
+
+    if form.is_valid():
+        user = form.get_user()
+
+        login(request, user)
+        return JsonResponse({
+            "success": True,
+            "message": f"Login berhasil! Selamat datang, {user.username}."
+        }, status=200)
+    else:
+        return JsonResponse({
+            "success": False,
+            "errors": form.errors
+        }, status=400)
+
+

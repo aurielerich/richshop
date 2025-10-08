@@ -192,7 +192,7 @@ jika beberapa selector CSS menargetkan elemen html yang sama, prioritasnya diten
 
 ## step by step
 
-1.  **Modularisasi:** Logika buat nampilin satu produk dipisah dari `main.html` ke file komponen sendiri, `card_product.html`. Jadi kodenya lebih rapih, gampang diatur, dan komponen kartunya bisa dipakai ulang di bagian lain.  
+1.  **Modularisasi:** Logika buat nampilin satu produk dipisah dari `main.html`` ke file komponen sendiri, `card_product.html`. Jadi kodenya lebih rapih, gampang diatur, dan komponen kartunya bisa dipakai ulang di bagian lain.  
 
 2.  **Desain Visual yang Informatif:** Kartu produk ditambahin *badge* warna yang ditempel di atas gambar. Dipakai buat nampilin info singkat kayak **Kategori**, status **"Featured"**, atau **"Hot"** tanpa makan banyak tempat.  
 
@@ -220,3 +220,60 @@ Thumbnail produk sekarang bukan lagi input URL, tapi udah bisa *upload* gambar l
     * Kalau produk nggak punya gambar, otomatis muncul *placeholder* (`no-product.png`) dari folder *static*.  
 
 6.  **Migrasi Database:** Jangan lupa jalanin `makemigrations` sama `migrate` buat nyesuaiin struktur database.  
+
+
+# Tugas 6: Pertanyaan Seputar AJAX
+
+Berikut adalah jawaban untuk serangkaian pertanyaan mengenai implementasi AJAX dalam pengembangan web, khususnya dengan kerangka kerja Django.
+
+---
+
+### 1. Apa perbedaan antara *synchronous request* dan *asynchronous request*?
+
+- **Synchronous Request (Permintaan Sinkron)**
+  Permintaan ini bersifat *blocking*. Artinya, saat *browser* meminta data ke server, interaksi pengguna akan "dikunci" dan *browser* harus menunggu sepenuhnya hingga server selesai merespons. Akibatnya, halaman seringkali harus dimuat ulang (*reload*) seluruhnya, yang dapat mengganggu alur pengguna.
+
+- **Asynchronous Request (Permintaan Asinkron)**
+  Permintaan ini berjalan di latar belakang (*background*) tanpa menghentikan interaksi pengguna. Dengan teknologi seperti AJAX, *browser* dapat mengirim data ke server dan menerima respons tanpa perlu memuat ulang halaman. Ini memungkinkan pengguna untuk tetap menggunakan aplikasi sementara pertukaran data terjadi.
+
+---
+
+### 2. Bagaimana alur kerja AJAX di Django?
+
+Alur permintaan dan respons AJAX dalam aplikasi Django umumnya mengikuti langkah-langkah berikut:
+
+1.  **Aksi Pengguna**: Proses diawali oleh pengguna yang memicu sebuah *event* di halaman web, misalnya dengan menekan tombol, mengirim formulir, atau mengetik di kolom pencarian.
+2.  **Permintaan JavaScript**: JavaScript di sisi klien menangkap *event* ini dan menggunakan `fetch()` API untuk mengirim permintaan HTTP (biasanya `GET` atau `POST`) ke sebuah *endpoint* URL di Django.
+3.  **Pemrosesan oleh Django**: *View* Django yang sesuai menerima permintaan tersebut. Logika di dalam *view* akan memproses data yang masuk (misalnya, menyimpan ke *database*, memvalidasi input) dan kemudian mengembalikan respons, umumnya dalam format **JSON**.
+4.  **Pembaruan Tampilan (DOM)**: JavaScript di klien menerima respons JSON tersebut dan secara dinamis memanipulasi *Document Object Model* (DOM) untuk memperbarui bagian halaman yang relevan—semuanya tanpa memerlukan *reload*.
+
+---
+
+### 3. Apa saja keuntungan menggunakan AJAX dibandingkan *render* biasa?
+
+Menggunakan AJAX menawarkan beberapa keunggulan signifikan dibandingkan dengan metode *rendering* halaman tradisional:
+
+-   **Pengalaman Pengguna yang Lebih Baik**: Interaksi terasa lebih cepat dan mulus karena tidak ada *full-page reload* yang mengganggu. Ini menciptakan pengalaman yang lebih modern, mirip aplikasi desktop.
+-   **Efisiensi Bandwidth**: AJAX hanya mentransfer data yang benar-benar dibutuhkan (misalnya, data JSON), bukan seluruh markup HTML dan aset halaman. Ini membuat aplikasi lebih hemat sumber daya jaringan.
+-   **Interaktivitas Ditingkatkan**: Memudahkan implementasi fitur-fitur dinamis seperti *live search*, notifikasi *real-time*, atau penambahan item ke keranjang belanja tanpa berpindah halaman.
+
+---
+
+### 4. Bagaimana cara mengamankan fitur Login dan Register berbasis AJAX di Django?
+
+Keamanan adalah aspek krusial saat menangani otentikasi. Berikut adalah beberapa praktik terbaik:
+
+-   **Gunakan Proteksi CSRF**: Pastikan setiap permintaan `POST` yang dikirim melalui AJAX menyertakan **CSRF Token**. Token ini harus dikirim dalam *header* permintaan (misalnya, `X-CSRFToken`) agar dapat divalidasi oleh *middleware* Django.
+-   **Validasi di Sisi Server**: Jangan pernah mempercayai input dari klien. Semua validasi data (seperti format email, kekuatan *password*, dan sanitasi input) harus selalu dilakukan di *backend* (Django), bahkan jika sudah divalidasi di *frontend*.
+-   **Gunakan HTTPS**: Selalu gunakan koneksi HTTPS untuk mengenkripsi semua komunikasi antara klien dan server. Ini melindungi data sensitif seperti *password* dari potensi penyadapan.
+-   **Batasi Metode HTTP**: Gunakan *decorator* seperti `@require_POST` pada *view* Django untuk memastikan *endpoint* yang mengubah data (seperti login dan register) hanya dapat diakses melalui metode `POST`.
+
+---
+
+### 5. Bagaimana AJAX memengaruhi *User Experience* (UX)?
+
+AJAX secara fundamental meningkatkan *User Experience* dengan membuat *website* terasa lebih **dinamis dan responsif**.
+
+-   Pengguna tidak lagi mengalami jeda atau kilatan putih akibat halaman yang memuat ulang setiap kali ada interaksi.
+-   Aksi seperti mengirim komentar, memberikan "like", atau memfilter data dapat terjadi secara instan di layar, menciptakan alur kerja yang lebih **mulus dan intuitif**.
+-   Namun, implementasi yang buruk dapat membingungkan. Jika tidak ada indikator pemuatan (*loading spinner*) atau penanganan *error* yang jelas, pengguna mungkin tidak tahu apakah aksinya berhasil atau gagal, yang justru dapat memperburuk UX.
